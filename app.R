@@ -37,16 +37,19 @@ ui <- fluidPage(
 
     # Application title
     titlePanel("Design Pediatric CT"),
+    tags$hr(),
+    
 
     # Sidebar
     sidebarLayout(
         sidebarPanel(
+            h5(helpText("Select Parameters")),
             selectInput("study_type", "Study:", choices = study_type_choices, selected = NULL),
             selectInput("age_group", "Age group:", choices = age_group_choices, selected = NULL),
             numericInput("weight_kg", "Weight (kg):", value = NULL, min = 0),
             selectInput("rate_formula", "Rate formular:", choices = rate_formula_choices, selected = NULL),
+            uiOutput("UI_delay_sec"),
             selectInput("iv_location", "IV line location:", choices = c("arm", "leg"), selected = NULL),
-            uiOutput("UI_delay_sec")
         ),
 
         # Main
@@ -101,7 +104,7 @@ server <- function(input, output) {
     output$clip <- renderUI({
       rclipButton(
         inputId = "clipbtn",
-        label = "Copy to clipboard",
+        label = "Copy",
         clipText = design_text_str(), 
         icon = icon("clipboard")
       )
