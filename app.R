@@ -6,6 +6,9 @@ library(rclipboard)
 library(bslib)
 
 
+# Choices -----------------------------------------------------------------
+
+
 study_type_choices <- list(
   "CT Chest" = "chest" , 
   "CTWA" = "whole_abd",
@@ -23,7 +26,10 @@ rate_formula_choices <- list(
  "(Contrast [ml] + 15) / (delay [s] - 15)" = "delay"
 )
 
-# UI
+
+# UI ----------------------------------------------------------------------
+
+
 ui <- fluidPage(
     theme = bslib::bs_theme(bootswatch = "minty"),
     # Copy botton
@@ -52,10 +58,14 @@ ui <- fluidPage(
     )
 )
 
-# Server
+
+# Server ------------------------------------------------------------------
+
+
 server <- function(input, output) {
+  
   # Design Text
-  design_text <- reactive({
+  design_text_str <- reactive({
     req(input$study_type, input$age_group, input$weight_kg)
     if(input$rate_formula == "delay") { req(input$delay_sec) }
     
@@ -68,7 +78,9 @@ server <- function(input, output) {
         rate_formula = input$rate_formula,
         delay_sec = input$delay_sec
       )
-    )
+    ) |> 
+      paste(collapse = "\n")
+    
   })
   
   output$UI_delay_sec <- renderUI({
@@ -80,7 +92,7 @@ server <- function(input, output) {
   # Design Text Output
   output$design_text <- renderPrint({
     
-    cat(design_text(), sep = "\n")
+    cat(design_text_str())
     
   })
   
@@ -90,7 +102,7 @@ server <- function(input, output) {
       rclipButton(
         inputId = "clipbtn",
         label = "Copy to clipboard",
-        clipText = design_text(), 
+        clipText = design_text_str(), 
         icon = icon("clipboard")
       )
     })
@@ -98,7 +110,7 @@ server <- function(input, output) {
   
   # Workaround for execution within RStudio version < 1.2
   if (interactive()){
-    observeEvent(input$clipbtn, clipr::write_clip(design_text()))
+    observeEvent(input$clipbtn, clipr::write_clip(design_text_str()))
   }
 
   

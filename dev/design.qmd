@@ -86,8 +86,19 @@ print_design_ct <- function(study_type,
 print_design_ct("chest", "younger", 20.5344)
 
 print_design_ct("whole_abd", "younger", 30, "leg") 
-print_design_ct("cta_liver", "younger", 12) 
+
+
+print_design_ct("cta_liver", "younger", 12) |> capture.output() |> cat()
 ```
+
+
+```{r}
+print_design_ct("cta_liver", "younger", 12) |> 
+  capture.output() |> 
+  paste(collapse = "\n") |> 
+  cat()
+```
+
 
 ## List: Study Type Description
 
