@@ -18,6 +18,9 @@ print_design_ct <- function(study_type,
   # Study Type
   cat(study_type_desc[[study_type]], "\n")
   
+  # Weight
+  cat("Body weight:", weight_kg, "kg", "\n")
+  
   # kV
   kV <- get_kV(weight_kg)
   cat(glue::glue("kV: {kV}"), "\n")

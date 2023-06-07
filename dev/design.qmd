@@ -54,6 +54,9 @@ print_design_ct <- function(study_type,
   # Study Type
   cat(study_type_desc[[study_type]], "\n")
   
+  # Weight
+  cat("Body weight:", weight_kg, "kg", "\n")
+  
   # kV
   kV <- get_kV(weight_kg)
   cat(glue::glue("kV: {kV}"), "\n")
@@ -83,9 +86,6 @@ print_design_ct <- function(study_type,
 print_design_ct("chest", "younger", 20.5344)
 
 print_design_ct("whole_abd", "younger", 30, "leg") 
-
-
-cat(capture.output(cat(print_design_ct("chest", "younger", 20.5344))),sep = "\n")
 ```
 
 ## List: Study Type Description
