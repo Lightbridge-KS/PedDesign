@@ -6,9 +6,6 @@ library(rclipboard)
 library(bslib)
 
 
-source("R/fct_main.R")
-source("R/fct_child.R")
-
 study_type_choices <- list(
   "CT Chest" = "chest" , 
   "CTWA" = "whole_abd",
@@ -29,6 +26,8 @@ rate_formula_choices <- list(
 # UI
 ui <- fluidPage(
     theme = bslib::bs_theme(bootswatch = "minty"),
+    # Copy botton
+    rclipboardSetup(),
 
     # Application title
     titlePanel("Design Pediatric CT"),
