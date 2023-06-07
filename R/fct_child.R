@@ -11,7 +11,6 @@ study_type_desc <- list(
 
 # Get kV ------------------------------------------------------------------
 
-
 get_kV <- function(weight_kg) {
   
   stopifnot(is.numeric(weight_kg) & weight_kg > 0)
@@ -28,12 +27,13 @@ get_kV <- function(weight_kg) {
     "120"
   } else {
     # weight_kg ≥ 60
-    "?"
+    "120 ?"
   }
   
   kV
   
 }
+
 
 
 # Get Noise Index ---------------------------------------------------------
