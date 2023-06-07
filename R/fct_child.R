@@ -75,7 +75,7 @@ print_delay_sec <- function(study_type,
     chest = "Delay: 45 sec", 
     whole_abd = "Delay: 60 or 65 or 70 sec", 
     chest_whole_abd = "Delay: 60 or 65 or 70 sec",  
-    cta_liver = "Arterial: 20 sec, Venous: 70 sec"
+    cta_liver = "Delay: 20 sec (CTA); 70 sec (Venous)"
   )
   
   switch (iv_location,
