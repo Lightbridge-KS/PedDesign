@@ -5,10 +5,10 @@ account: kittipos-sir
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9258251
-bundleId: 7316449
+bundleId: 7354263
 url: https://kittipos-sir.shinyapps.io/PedDesign/
-when: 1686146466.11345
-lastSyncTime: 1686146466.1136
+when: 1686931579.57121
+lastSyncTime: 1686931579.57122
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: .RData|dev/design.qmd|dev/rclipboard-mod.R|dev/rclipboard-test.R
+ignoredFiles: .RData|dev/child.qmd|dev/design1.qmd|dev/design2.qmd|dev/rclipboard-mod.R|dev/rclipboard-test.R|old/fct_child_old.R|old/fct_main_old.R|R/.DS_Store|README.md

@@ -1,0 +1,276 @@
+---
+title: "Design v2"
+format: html
+---
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+here::i_am("dev/design2.qmd")
+library(here)
+```
+
+# Planning
+
+### Design All: design_*
+
+`design_ct`
+
+- `study_type`: "chest", "whole_abd", "chest_whole_abd", "cta_liver"
+
+### Design Study
+
+-   CT Chest: `design_chest`
+-   CT Whole abdomen: `design_whole_abd`
+-   CT Chest + Whole abdomen: `design_chest_whole_abd`
+-   CTA liver: `design_cta_liver`
+
+Template
+
+{study_type}
+Body weight: `weight_kg` kg 
+kV: `kV` 
+mA: auto 
+Noise index: `noise_index` 
+Delay: ___ sec 
+`print_contrast()`
+`print_rate_ml_sec()`
+
+# Design All
+
+```{r design_ct}
+design_ct <- function(study_type,
+                      age_group,
+                      weight_kg,
+                      rate_formula = c("no_delay", "delay"),
+                      delay_sec = NULL) {
+  
+  study_type <- match.arg(study_type, 
+                          choices = c("chest", "whole_abd",
+                                      "chest_whole_abd", "cta_liver"))
+  age_group <- match.arg(age_group, 
+                         choices = c("younger_child", "older_child"))
+  rate_formula <- match.arg(rate_formula)
+  
+  # CT Chest
+  if(study_type == "chest") {
+    design_chest(age_group = age_group, weight_kg = weight_kg)
+  }
+  # CT Whole Abdomen
+  if(study_type == "whole_abd") {
+    design_whole_abd(age_group = age_group, weight_kg = weight_kg,
+                     rate_formula = rate_formula, delay_sec = delay_sec)
+  }
+  # CT Chest + WA
+  if(study_type == "chest_whole_abd") {
+    design_chest_whole_abd(age_group = age_group, weight_kg = weight_kg,
+                           rate_formula = rate_formula, delay_sec = delay_sec)
+  }
+  # CTA Liver
+  if(study_type == "cta_liver") {
+    design_cta_liver(age_group = age_group, weight_kg = weight_kg)
+  }
+}
+
+design_ct("chest", "younger", 3)
+design_ct("whole_abd", "older", 6, "delay", 65)
+```
+
+# Design Study
+
+## CT Chest
+
+```{r design_chest}
+design_chest <- function(age_group,
+                         weight_kg
+                         ) {
+  
+    age_group <- match.arg(age_group, 
+                           choices = c("younger_child", "older_child"))
+    
+    cat("-- Design CT --", "\n\n")
+    cat("CT chest, venous only","\n")
+    # Weight
+    cat("Body weight:", weight_kg, "kg", "\n")
+    
+    # kV
+    kV <- get_kV(weight_kg)
+    cat("kV:", kV, "\n")
+    # mA
+    cat("mA: auto", "\n")
+    # Noise
+    noise_index <- switch (age_group,
+      "younger_child" = 17,
+      "older_child" = 20
+    )
+    cat("Noise index:", noise_index, "\n")
+    # Delay
+    cat("Delay: 45 sec", "\n")
+    # Contrast
+    ml_kg <-  1 # Chest
+    print_contrast(ml_kg = ml_kg, weight_kg = weight_kg); cat("\n")
+    # Rate
+    print_rate_ml_sec(
+      contrast_ml = get_contrast_ml(ml_kg = ml_kg, weight_kg = weight_kg), 
+      rate_formula = "no_delay"
+    )
+    cat("\n\n---")
+  
+}
+
+design_chest("younger_child", 12)
+design_chest("older_child", 50)
+```
+
+
+
+## CT Whole abdomen
+
+```{r design_whole_abd}
+design_whole_abd <- function(age_group,
+                             weight_kg, 
+                             rate_formula = c("no_delay", "delay"),
+                             delay_sec = NULL
+                             ){
+  
+    age_group <- match.arg(age_group,
+                           choices = c("younger_child", "older_child"))
+    rate_formula <- match.arg(rate_formula)
+
+    cat("-- Design CT --", "\n\n")
+    cat("CT whole abdomen, venous only","\n")
+    # Weight
+    cat("Body weight:", weight_kg, "kg", "\n")
+
+    # kV
+    kV <- get_kV(weight_kg)
+    cat("kV:", kV, "\n")
+    # mA
+    cat("mA: auto", "\n")
+    # Noise
+    noise_index <- switch (age_group,
+      "younger_child" = 15,
+      "older_child" = 17
+    )
+    cat("Noise index:", noise_index, "\n")
+    # Delay
+    if (rate_formula == "no_delay") {
+      cat("Delay: 60 or 65 or 70 sec", "\n")
+    } else {
+      cat("Delay:", delay_sec, "\n")
+    }
+    
+    # Contrast
+    ml_kg <- 2 # WA
+    print_contrast(ml_kg = ml_kg, weight_kg = weight_kg); cat("\n")
+    # Rate
+    print_rate_ml_sec(
+      contrast_ml = get_contrast_ml(ml_kg = ml_kg, weight_kg = weight_kg),
+      rate_formula = rate_formula,
+      delay_sec = delay_sec
+    )
+    cat("\n\n---")
+  
+}
+
+design_whole_abd("younger_child", 12)
+design_whole_abd("younger_child", 12, "delay", 70)
+```
+
+## CT Chest + WA
+
+```{r design_chest_whole_abd}
+design_chest_whole_abd <- function(age_group,
+                                   weight_kg, 
+                                   rate_formula = c("no_delay", "delay"),
+                                   delay_sec = NULL
+                             ){
+  
+    age_group <- match.arg(age_group,
+                           choices = c("younger_child", "older_child"))
+    rate_formula <- match.arg(rate_formula)
+
+    cat("-- Design CT --", "\n\n")
+    cat("Venous chest + whole abdomen ","\n")
+    # Weight
+    cat("Body weight:", weight_kg, "kg", "\n")
+
+    # kV
+    kV <- get_kV(weight_kg)
+    cat("kV:", kV, "\n")
+    # mA
+    cat("mA: auto", "\n")
+    # Noise
+    noise_index <- switch (age_group,
+      "younger_child" = 15,
+      "older_child" = 17
+    )
+    cat("Noise index:", noise_index, "\n")
+    # Delay
+    if (rate_formula == "no_delay") {
+      cat("Delay: 60 or 65 or 70 sec", "\n")
+    } else {
+      cat("Delay:", delay_sec, "\n")
+    }
+    
+    # Contrast
+    ml_kg <- 2 # WA
+    print_contrast(ml_kg = ml_kg, weight_kg = weight_kg); cat("\n")
+    # Rate
+    print_rate_ml_sec(
+      contrast_ml = get_contrast_ml(ml_kg = ml_kg, weight_kg = weight_kg),
+      rate_formula = rate_formula,
+      delay_sec = delay_sec
+    )
+    cat("\n\n---")
+  
+}
+
+design_chest_whole_abd("younger_child", 12)
+```
+
+## CTA Liver
+
+```{r design_cta_liver}
+design_cta_liver <- function(age_group,
+                             weight_kg
+                             ){
+  
+    age_group <- match.arg(age_group,
+                           choices = c("younger_child", "older_child"))
+
+    cat("-- Design CT --", "\n\n")
+    cat("CTA liver","\n")
+    # Weight
+    cat("Body weight:", weight_kg, "kg", "\n")
+
+    # kV
+    kV <- get_kV(weight_kg)
+    cat("kV:", kV, "\n")
+    # mA
+    cat("mA: auto", "\n")
+    # Noise
+    noise_index <- switch (age_group,
+      "younger_child" = 15,
+      "older_child" = 17
+    )
+    cat("Noise index:", noise_index, "\n")
+    # Delay
+    cat("Delay: 20 sec (CTA); 70 sec (Venous)", "\n")
+
+    # Contrast
+    ml_kg <- 2.5 # WA
+    print_contrast(ml_kg = ml_kg, weight_kg = weight_kg); cat("\n")
+    ml <- get_contrast_ml(ml_kg = ml_kg, weight_kg = weight_kg)
+    
+    # Rate
+    rate <- (ml + 15) / 20
+    rate_adj <- round_up_decimal(rate, 1) # Round up for 1 decimal
+    cat(glue::glue("Rate: {rate_adj} ml/sec ({ml} + 15) / 20 = {round(rate, 3)}"))
+    
+    cat("\n\n---")
+  
+}
+
+design_cta_liver("younger", 20.5)
+```
+

@@ -44,12 +44,12 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             h5(helpText("Select Parameters")),
-            selectInput("study_type", "Study:", choices = study_type_choices, selected = NULL),
+            selectInput("study_type", "Study:", choices = study_type_choices, selected = "CT Chest"),
             selectInput("age_group", "Age group:", choices = age_group_choices, selected = NULL),
             numericInput("weight_kg", "Weight (kg):", value = NULL, min = 0),
-            selectInput("rate_formula", "Rate formular:", choices = rate_formula_choices, selected = NULL),
+            uiOutput("UI_rate_formula"),
             uiOutput("UI_delay_sec"),
-            selectInput("iv_location", "IV line location:", choices = c("arm", "leg"), selected = NULL),
+            #selectInput("iv_location", "IV line location:", choices = c("arm", "leg"), selected = NULL),
         ),
 
         # Main
@@ -70,14 +70,15 @@ server <- function(input, output) {
   # Design Text
   design_text_str <- reactive({
     req(input$study_type, input$age_group, input$weight_kg)
-    if(input$rate_formula == "delay") { req(input$delay_sec) }
+    if((input$study_type %in% c("whole_abd", "chest_whole_abd"))) {
+      if(input$rate_formula == "delay") { req(input$delay_sec) }
+    }
     
     capture.output(
-      print_design_ct(
+      design_ct(
         study_type = input$study_type,
         age_group = input$age_group,
         weight_kg = input$weight_kg,
-        iv_location = input$iv_location,
         rate_formula = input$rate_formula,
         delay_sec = input$delay_sec
       )
@@ -86,8 +87,16 @@ server <- function(input, output) {
     
   })
   
+  output$UI_rate_formula <- renderUI({
+    req(input$study_type)
+    if(input$study_type %in% c("whole_abd", "chest_whole_abd") ) {
+      selectInput("rate_formula", "Rate formular:", choices = rate_formula_choices, selected = NULL)
+      }
+  })
+  
   output$UI_delay_sec <- renderUI({
-    if(input$rate_formula == "delay") {
+    req(input$rate_formula)
+    if((input$study_type %in% c("whole_abd", "chest_whole_abd")) & input$rate_formula == "delay") {
       numericInput("delay_sec", "Choose Delay (sec):", value = NULL, min = 0)
     }
   })
