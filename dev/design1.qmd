@@ -1,11 +1,11 @@
 ---
-title: "Design App"
+title: "Design App V1"
 format: html
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
-here::i_am("dev/design.qmd")
+here::i_am("dev/design1.qmd")
 library(here)
 library(cli)
 ```
@@ -86,9 +86,10 @@ print_design_ct <- function(study_type,
 print_design_ct("chest", "younger", 20.5344)
 
 print_design_ct("whole_abd", "younger", 30, "leg") 
+print_design_ct("chest_whole_abd", "younger", 30, "leg") 
 
 
-print_design_ct("cta_liver", "younger", 12) |> capture.output() |> cat()
+print_design_ct("cta_liver", "younger", 12) # |> capture.output() |> cat()
 ```
 
 
@@ -323,7 +324,7 @@ print_rate_ml_sec <- function(contrast_ml,
       rate <- (contrast_ml + 15) / 45 
       rate_adj <- ceiling_dec(rate, 1) # Round up for 1 decimal
       
-      show_calc <- glue::glue("({contrast_ml} + 15) / 45 = {round(rate, 2)}")
+      show_calc <- glue::glue("({contrast_ml} + 15) / 45 = {round(rate, 3)}")
   
       
       },
@@ -334,7 +335,7 @@ print_rate_ml_sec <- function(contrast_ml,
       rate <- (contrast_ml + 15) / (delay_sec - 15) 
       rate_adj <- ceiling_dec(rate, 1) # Round up for 1 decimal
       
-      show_calc <- glue::glue("({contrast_ml} + 15) / ({delay_sec} - 15) = {round(rate, 2)}")
+      show_calc <- glue::glue("({contrast_ml} + 15) / ({delay_sec} - 15) = {round(rate, 3)}")
       
       }
   )
@@ -351,6 +352,9 @@ ceiling_dec <- function(x, level=1) round(x + 5*10^(-level-1), level)
 
 ceiling_dec(2.3344, 1)
 ceiling_dec(2.3344)
+ceiling_dec(2.1, 1)
+ceiling_dec(2.3, 1)
+ceiling_dec(2.32, 1)
 ```
 
 
